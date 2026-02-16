@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOKYO MD5</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+}
+
+.container{
+    width:360px;
+    background:rgba(255,255,255,0.05);
+    border-radius:20px;
+    padding:25px;
+    backdrop-filter:blur(10px);
+    box-shadow:0 0 25px rgba(0,0,0,0.5);
+}
+
+h1{
+    text-align:center;
+    letter-spacing:3px;
+    margin-bottom:5px;
+}
+
+.sub{
+    text-align:center;
+    opacity:0.7;
+    margin-bottom:20px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:none;
+    outline:none;
+    background:#0d1b2a;
+    color:#00eaff;
+    font-size:14px;
+}
+
+button{
+    margin-top:15px;
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    font-weight:bold;
+    font-size:16px;
+    color:white;
+    cursor:pointer;
+    background:linear-gradient(90deg,#00dbde,#fc00ff);
+    box-shadow:0 0 15px rgba(255,0,255,0.5);
+}
+
+.result{
+    margin-top:20px;
+    text-align:center;
+}
+
+.big{
+    font-size:28px;
+    font-weight:bold;
+}
+
+.red{
+    color:#ff4d4d;
+}
+
+.green{
+    color:#00ff9d;
+}
+
+.boxrow{
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+}
+
+.box{
+    flex:1;
+    background:rgba(255,255,255,0.07);
+    border-radius:12px;
+    padding:10px;
+    font-size:14px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>TOKYO MD5</h1>
+    <div class="sub">Nhập mã MD5 vào đây</div>
+
+    <input id="md5" placeholder="Nhập MD5...">
+
+    <button onclick="phanTich()">PHÂN TÍCH</button>
+
+    <div class="result">
+
+        <div>Dự đoán:</div>
+        <div id="ketqua" class="big">---</div>
+
+        <div class="boxrow">
+            <div class="box">
+                Tỉ lệ thắng<br>
+                <b id="tile">0%</b>
+            </div>
+
+            <div class="box">
+                Nhà cái<br>
+                <b id="nhacai">---</b>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function hexToNumber(hex){
+    return parseInt(hex,16);
+}
+
+function phanTich(){
+
+    let md5 = document.getElementById("md5").value.trim();
+
+    if(md5.length < 10){
+        alert("Nhập MD5 hợp lệ");
+        return;
+    }
+
+    // ===== Thuật toán nâng cấp =====
+
+    let part1 = hexToNumber(md5.substring(0,8));
+    let part2 = hexToNumber(md5.substring(8,16));
+    let part3 = hexToNumber(md5.substring(16,24));
+    let part4 = hexToNumber(md5.substring(24,32));
+
+    let mix = (part1 ^ part2 ^ part3 ^ part4) >>> 0;
+
+    let dao = md5.split("").reverse().join("");
+    let extra = hexToNumber(dao.substring(0,8));
+
+    let finalNumber = (mix + extra) % 100;
+
+    // ===== Kết quả =====
+
+    let ketqua = finalNumber >= 50 ? "TÀI" : "XỈU";
+
+    // % tin cậy nâng cấp
+    let doLech = Math.abs(finalNumber - 50);
+    let percent = 55 + Math.floor(doLech * 0.9);
+
+    if(percent > 98) percent = 98;
+
+    // phát hiện can thiệp
+    let canThiep = (mix % 7 === 0 || mix % 13 === 0) ? "Can thiệp" : "An toàn";
+
+    // ===== Hiển thị =====
+
+    let kqEl = document.getElementById("ketqua");
+
+    kqEl.innerHTML = ketqua;
+    kqEl.className = "big " + (ketqua === "TÀI" ? "red" : "green");
+
+    document.getElementById("tile").innerHTML = percent + "%";
+    document.getElementById("nhacai").innerHTML = canThiep;
+
+}
+
+</script>
+
+</body>
+</html>
